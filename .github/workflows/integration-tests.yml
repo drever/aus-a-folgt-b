@@ -1,0 +1,253 @@
+name: integration-tests
+run-name: ${{ github.actor }} running integration tests
+on: [pull_request]
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+
+  build:
+    runs-on: ubuntu-22.04
+    name: Checks
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: pip install --upgrade pip
+      - run: pip install mypy==v0.902
+#      - run: pip install "black==23.7.0" pylint==v3.0.0a3 mypy==v0.902
+#      - run: black --diff --check $(git ls-files '*.py')
+#      - run: pylint --disable=all --enable=unused-import $(git ls-files '*.py')
+      - run: mypy --strict $(git ls-files '*.py')
+
+  byte-serialzation:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: byte protocol test
+        run: |
+           export PYTHONPATH=$PYTHONPATH:./
+           pytest cognibit/test/serialization_deserialization.py
+
+  highway:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/highway/test_highway.py -m ci -s
+
+  urban:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_stable.py -m ci -s
+
+  urban_reaction:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_reaction.py -m ci -s
+
+  urban_experimental:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_experimental.py -m ci -s
+
+  perf_lin:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_performance.py -m perf -s
+
+  perf_win:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          $env:PYTHONPATH += ";../"
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          $env:PYTHONPATH += ";./"
+          pytest cognibit/test/basic_integration_tests/urban/test_performance.py -m perf -s
+
+  junction:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_junction.py -m ci -s
+
+  pedestrian:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_pedestrian.py -m ci -s
+
+  pedestrian_crosswalk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_pedestrian_crosswalk.py -m ci -s
+
+  determinism:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          pip install -r requirements-ci.txt
+
+      - name: generate licence
+        run: |
+          pwd
+          cd tools
+          export PYTHONPATH=$PYTHONPATH:../
+          python license.py
+          cd ..
+
+      - name: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:./
+          pytest cognibit/test/basic_integration_tests/urban/test_determinism.py -m ci -s
