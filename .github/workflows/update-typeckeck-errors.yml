@@ -1,0 +1,14 @@
+name: Sync typecheck errors
+run-name: ${{ github.actor }} running typecheck error sync
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  if_merged_into_development:
+    if: github.event.pull_request.merged == true 
+    runs-on: self-hosted
+    steps:
+      - run: echo The PR was merged into ${{ github.ref }}
+
